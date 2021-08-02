@@ -2,3 +2,4 @@
 *.LSOverride
 Thumbs.db
 .bundle
+.idea
