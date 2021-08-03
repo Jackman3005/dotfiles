@@ -1,8 +1,8 @@
-#
-# .zshrc
-#
-# @author Jeff Geerling
-#
+#################################################################
+#                                                               #
+#  Configure some sensible defaults, most taken from Geerling   #
+#                                                               #
+#################################################################
 
 # Colors.
 unset LSCOLORS
@@ -12,26 +12,11 @@ export CLICOLOR_FORCE=1
 # Don't require escaping globbing characters in zsh.
 unsetopt nomatch
 
-# Nicer prompt.
-# export PS1=$'\n'"%F{green} %*%F %3~ %F{white}"$'\n'"$ "
+# Better default prompt. OhMyZsh (if installed) will replace with a themed prompt
 export PS1=$'\n'"%F{green}%~%  %F{yellow}%*%F %3~ %F{white}"$'\n'"$ "
-# %F{green} %*%F %3~ %F{white}
-# $
-
-# Enable plugins.
-plugins=(git brew history kubectl history-substring-search)
-
-# Custom $PATH with extra locations.
-export PATH=$HOME/Library/Python/3.8/bin:/opt/homebrew/bin:/usr/local/bin:/usr/local/sbin:$HOME/bin:$HOME/go/bin:/usr/local/git/bin:$HOME/.composer/vendor/bin:$PATH
 
 # Bash-style time output.
 export TIMEFMT=$'\nreal\t%*E\nuser\t%*U\nsys\t%*S'
-
-# Include alias file (if present) containing aliases for ssh, etc.
-if [ -f ~/.aliases ]
-then
-  source ~/.aliases
-fi
 
 # Set architecture-specific brew share path.
 arch_name="$(uname -m)"
@@ -48,47 +33,41 @@ source ${share_path}/zsh-history-substring-search/zsh-history-substring-search.z
 bindkey "^[[A" history-substring-search-up
 bindkey "^[[B" history-substring-search-down
 
-alias g='git'
-
 # Completions.
 autoload -Uz compinit && compinit
 # Case insensitive.
 zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
 
 
-# Enter a running Docker container.
-function denter() {
- if [[ ! "$1" ]] ; then
-     echo "You must supply a container ID or name."
-     return 0
- fi
+# Enable plugins.
+plugins=(git brew history kubectl history-substring-search)
 
- docker exec -it $1 bash
- return 0
-}
+#################################################################
+#                                                               #
+#     Oh-My-Zsh configuration (if installed)                    #
+#                                                               #
+#################################################################
+if [ -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+    export ZSH="$HOME/.oh-my-zsh"
+    ZSH_THEME="amuse"
+
+    # run oh-my-zsh to load themes and plugins
+    source "$ZSH/oh-my-zsh.sh"
+fi
+
+# Include alias file (if present) containing aliases for ssh, etc.
+[ -f "$HOME/.aliases" ] && source "$HOME/.aliases"
+
+# Include functions file (if present) containing custom useful functions
+[ -f "$HOME/.functions" ] && source "$HOME/.functions"
 
 
-# Allow Composer to use almost as much RAM as Chrome.
-export COMPOSER_MEMORY_LIMIT=-1
-
-# Ask for confirmation when 'prod' is in a command string.
-#prod_command_trap () {
-#  if [[ $BASH_COMMAND == *prod* ]]
-#  then
-#    read -p "Are you sure you want to run this command on prod [Y/n]? " -n 1 -r
-#    if [[ $REPLY =~ ^[Yy]$ ]]
-#    then
-#      echo -e "\nRunning command \"$BASH_COMMAND\" \n"
-#    else
-#      echo -e "\nCommand was not run.\n"
-#      return 1
-#    fi
-#  fi
-#}
-#shopt -s extdebug
-#trap prod_command_trap DEBUG
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/Users/pivotal/.sdkman"
-[[ -s "/Users/pivotal/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/pivotal/.sdkman/bin/sdkman-init.sh"
+# SDKMAN manages installed java versions
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
 export SDKMAN_OFFLINE_MODE=false
+
+# NVM manages installed node versions
+export NVM_DIR="$HOME/.nvm"
+  [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+  [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
