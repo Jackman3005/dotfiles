@@ -7,7 +7,10 @@
 # Colors.
 unset LSCOLORS
 export CLICOLOR=1
-export CLICOLOR_FORCE=1
+
+# caused issues with testcafe finding browsers because grep was used and it had color characters f*cking up the paths testcafe used
+# may be useful when wanting to pipe colourised output (normally does not retain color characters)
+# export CLICOLOR_FORCE=1
 
 # Don't require escaping globbing characters in zsh.
 unsetopt nomatch
