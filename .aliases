@@ -1,2 +1,5 @@
 alias g='git'
 alias cat='bat'
+
+alias myip='ipconfig getifaddr $(route get default | grep interface | cut -d" " -f4)'
+
