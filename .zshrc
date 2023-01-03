@@ -12,6 +12,25 @@ export CLICOLOR=1
 # may be useful when wanting to pipe colourised output (normally does not retain color characters)
 # export CLICOLOR_FORCE=1
 
+if  command -v pathadd > /dev/null 2>&1; then
+  echo "WARNING: pathadd is already in context, possibly this file has been sourced twice, or another service has added pathadd"
+fi
+pathadd() {
+    newelement=${1%/}
+    if [ -d "$1" ] && ! echo $PATH | grep -E -q "(^|:)$newelement($|:)" ; then
+        if [ "$2" = "after" ] ; then
+            export PATH="$PATH:$newelement"
+        else
+            export PATH="$newelement:$PATH"
+        fi
+    fi
+}
+
+pathrm() {
+    export PATH="$(echo $PATH | sed -e "s;\(^\|:\)${1%/}\(:\|\$\);\1\2;g" -e 's;^:\|:$;;g' -e 's;::;:;g')"
+}
+
+
 # Don't require escaping globbing characters in zsh.
 unsetopt nomatch
 
@@ -83,4 +102,47 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # M1 homebrew not added to path by default
-export PATH=$PATH:/opt/homebrew/bin
+export PATH=/opt/homebrew/bin:$PATH
+
+
+# START: Add direnv hook
+_direnv_hook() {
+  trap -- '' SIGINT;
+  eval "$("/opt/homebrew/bin/direnv" export zsh)";
+  trap - SIGINT;
+}
+typeset -ag precmd_functions;
+if [[ -z "${precmd_functions[(r)_direnv_hook]+1}" ]]; then
+  precmd_functions=( _direnv_hook ${precmd_functions[@]} )
+fi
+typeset -ag chpwd_functions;
+if [[ -z "${chpwd_functions[(r)_direnv_hook]+1}" ]]; then
+  chpwd_functions=( _direnv_hook ${chpwd_functions[@]} )
+fi
+# END: Add direnv hook
+
+# Created by `pipx` on 2022-03-29 12:09:44
+export PATH="$PATH:/Users/jack/Library/Python/3.9/bin"
+
+
+export ANDROID_HOME=/Users/$USER/Library/Android/sdk
+
+if [ -d "$ANDROID_HOME" ]; then
+  export PATH=${PATH}:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+fi
+
+# START: Ruby installed by brew
+pathadd "/opt/homebrew/opt/ruby/bin"
+# For compilers to find ruby you may need to set:
+export LDFLAGS="-L/opt/homebrew/opt/ruby/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/ruby/include"
+for file in /opt/homebrew/lib/ruby/gems/*/gems/*/bin; do
+  if [ -e "$file" ] ; then
+     pathadd "$file"
+  fi
+done
+# END: Ruby installed by brew
+
+# add webstorm to path if installed
+pathadd "/Applications/WebStorm.app/Contents/MacOS"
+
