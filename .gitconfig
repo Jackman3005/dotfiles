@@ -26,13 +26,22 @@
   cmd = /Applications/IntelliJ\\ IDEA.app/Contents/MacOS/idea merge $(cd $(dirname \"$LOCAL\") && pwd)/$(basename \"$LOCAL\") $(cd $(dirname \"$REMOTE\") && pwd)/$(basename \"$REMOTE\") $(cd $(dirname \"$BASE\") && pwd)/$(basename \"$BASE\") $(cd $(dirname \"$MERGED\") && pwd)/$(basename \"$MERGED\")
   trustExitCode = true
 [alias]
+  bl = "!list_recent_branches() { local lines=$1; git branch --sort=-committerdate --format=\"%(align:width=20)%(committerdate:relative)%(end)%(align:width=20)%(committername)%(end)%(if)%(refname:rstrip=3)%(then)%(color:dim)%(else)%(end)%(align:width=50)%(HEAD)%(refname:short)%(color:reset)%(end)%(contents:subject)\" --color --all | head -\"${lines:-25}\"; }; list_recent_branches"
   c = commit
   ca = commit --amend --no-edit
-  l = log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit
+  cp = cherry-pick
+  l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  ld = "!git --no-pager log origin/development..HEAD --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
   co = checkout
   s = status
   st = status
   a = add
   pr = pull --rebase
+  pu = "!push() { if git rev-parse --abbrev-ref --symbolic-full-name @{u} > /dev/null 2>&1; then git push $@; else git push --set-upstream origin $(git symbolic-ref --short HEAD) $@; fi; }; push"
 [pull]
 	rebase = true
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
