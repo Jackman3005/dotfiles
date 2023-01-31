@@ -31,7 +31,8 @@
   ca = commit --amend --no-edit
   cp = cherry-pick
   l = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-  ld = "!git --no-pager log origin/development..HEAD --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+  ld = "!git --no-pager log origin/${1:-development}..HEAD --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative"
+  changes="!git --no-pager log origin/${1:-development}..HEAD --pretty='[%s](https://github.com/questmate/qm-universe/commit/%H)%n%b'"
   co = checkout
   s = status
   st = status
