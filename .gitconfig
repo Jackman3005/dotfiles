@@ -26,7 +26,7 @@
   cmd = /Applications/IntelliJ\\ IDEA.app/Contents/MacOS/idea merge $(cd $(dirname \"$LOCAL\") && pwd)/$(basename \"$LOCAL\") $(cd $(dirname \"$REMOTE\") && pwd)/$(basename \"$REMOTE\") $(cd $(dirname \"$BASE\") && pwd)/$(basename \"$BASE\") $(cd $(dirname \"$MERGED\") && pwd)/$(basename \"$MERGED\")
   trustExitCode = true
 [alias]
-  bl = "!list_recent_branches() { local lines=$1; git branch --sort=-committerdate --format=\"%(align:width=20)%(committerdate:relative)%(end)%(align:width=20)%(committername)%(end)%(if)%(refname:rstrip=3)%(then)%(color:dim)%(else)%(end)%(align:width=50)%(HEAD)%(refname:short)%(color:reset)%(end)%(contents:subject)\" --color --all | head -\"${lines:-25}\"; }; list_recent_branches"
+  bl = "!list_recent_branches() { local lines=$1; git branch --sort=committerdate --format=\"%(align:width=20)%(committerdate:relative)%(end)%(align:width=20)%(committername)%(end)%(if)%(refname:rstrip=3)%(then)%(color:dim)%(else)%(end)%(align:width=50)%(HEAD)%(refname:short)%(color:reset)%(if)%(upstream:track)%(then)%(color:bold yellow) %(upstream:track)%(else)%(end)%(end)%(color:reset)\" --color --all | tail -\"${lines:-25}\"; }; list_recent_branches"
   c = commit
   ca = commit --amend --no-edit
   cp = cherry-pick
@@ -39,6 +39,7 @@
   a = add
   pr = pull --rebase
   pu = "!push() { if git rev-parse --abbrev-ref --symbolic-full-name @{u} > /dev/null 2>&1; then git push $@; else git push --set-upstream origin $(git symbolic-ref --short HEAD) $@; fi; }; push"
+  ri = rebase --interactive origin/development
 [pull]
 	rebase = true
 [filter "lfs"]
